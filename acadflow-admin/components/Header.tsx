@@ -3,6 +3,8 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { LogOut, ChevronRight, Bell, Menu } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'react-hot-toast'
+import Modal from '@/components/ui/Modal'
 
 interface HeaderProps {
   onMenuToggle?: () => void
@@ -29,6 +31,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [loggingOut, setLoggingOut] = useState(false)
+  const [showJoke, setShowJoke] = useState(false)
   const breadcrumbs = getBreadcrumbs(pathname)
 
   const handleLogout = async () => {
@@ -81,13 +84,14 @@ export default function Header({ onMenuToggle }: HeaderProps) {
 
       {/* Right side actions */}
       <div className="flex items-center gap-2 flex-shrink-0">
-        {/* Notification bell — placeholder */}
+        {/* Notification bell — easter egg */}
         <button
+          onClick={() => setShowJoke(true)}
           className="relative p-2 rounded-lg transition-colors hover:bg-white/5 text-dark-400 hover:text-white"
-          title="Notifications (coming soon)"
+          title="Notifications"
         >
           <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-500" />
+          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
         </button>
 
         {/* Admin badge */}
@@ -117,6 +121,21 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           <span className="hidden sm:inline">{loggingOut ? 'Logging out...' : 'Logout'}</span>
         </button>
       </div>
+
+      <Modal isOpen={showJoke} onClose={() => setShowJoke(false)} title="Important Update" size="sm">
+        <div className="py-8 flex flex-col items-center justify-center text-center animate-fade-in">
+          <div className="text-6xl mb-4 animate-bounce">🤡</div>
+          <h2 className="text-2xl font-black text-white mb-2 leading-tight">
+            Haa padh le lode<br/>chull tera jayega nhi
+          </h2>
+          <button 
+            onClick={() => setShowJoke(false)} 
+            className="btn btn-primary mt-6 px-8 py-3 text-lg w-full justify-center"
+          >
+            Theek Hai Bhai
+          </button>
+        </div>
+      </Modal>
     </header>
   )
 }

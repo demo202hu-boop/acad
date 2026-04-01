@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { clsx } from 'clsx'
 
@@ -29,6 +30,11 @@ export default function Modal({
   footer,
 }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -44,12 +50,12 @@ export default function Modal({
     }
   }, [isOpen, onClose])
 
-  if (!isOpen) return null
+  if (!isOpen || !mounted) return null
 
-  return (
+  return createPortal(
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in modal-overlay"
+      className="fixed inset-0 z-[999] flex items-center justify-center p-4 animate-fade-in modal-overlay"
       onClick={(e) => { if (e.target === overlayRef.current) onClose() }}
     >
       <div
@@ -91,6 +97,7 @@ export default function Modal({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
