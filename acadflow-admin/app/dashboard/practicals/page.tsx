@@ -220,9 +220,9 @@ export default function PracticalsPage() {
       </div>
 
       {/* Filters */}
-      <div className="glass-card p-4 flex flex-wrap gap-3 items-center">
+      <div className="glass-card p-3 md:p-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center">
         {/* Search */}
-        <div className="relative flex-1 min-w-[200px]">
+        <div className="relative flex-1 w-full md:min-w-[200px]">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400" />
           <input
             type="text"
@@ -234,12 +234,12 @@ export default function PracticalsPage() {
         </div>
 
         {/* Named Batch filter */}
-        <div className="flex items-center gap-2">
-          <Filter size={14} className="text-dark-400 flex-shrink-0" />
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <Filter size={14} className="text-dark-400 flex-shrink-0 hidden md:block" />
           <select
             value={selectedBatchId}
             onChange={e => { setSelectedBatchId(e.target.value); setPage(1) }}
-            className="input-field w-56"
+            className="input-field w-full md:w-56"
           >
             <option value="">All Batches</option>
             {Object.entries(
@@ -265,7 +265,7 @@ export default function PracticalsPage() {
         <select
           value={statusFilter}
           onChange={e => { setStatusFilter(e.target.value); setPage(1) }}
-          className="input-field w-36"
+          className="input-field w-full md:w-36"
         >
           <option value="all">All Status</option>
           <option value="active">Active</option>

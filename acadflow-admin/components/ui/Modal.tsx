@@ -54,7 +54,7 @@ export default function Modal({
     >
       <div
         className={clsx(
-          'w-full animate-slide-up rounded-2xl overflow-hidden shadow-2xl',
+          'w-full max-h-[100dvh] md:max-h-[95vh] flex flex-col animate-slide-up rounded-2xl overflow-hidden shadow-2xl',
           sizeClasses[size]
         )}
         style={{
@@ -77,14 +77,14 @@ export default function Modal({
         </div>
 
         {/* Body */}
-        <div className="px-6 py-4 overflow-y-auto max-h-[calc(90vh-140px)]">
+        <div className="px-4 md:px-6 py-4 overflow-y-auto flex-1">
           {children}
         </div>
 
         {/* Footer */}
         {footer && (
           <div
-            className="px-6 py-4 flex justify-end gap-3 flex-shrink-0"
+            className="px-4 md:px-6 py-4 flex flex-col sm:flex-row justify-end gap-3 flex-shrink-0"
             style={{ borderTop: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.2)' }}
           >
             {footer}

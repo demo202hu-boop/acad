@@ -40,7 +40,9 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     <aside
       className={clsx(
         'fixed left-0 top-0 h-full flex flex-col z-40 transition-all duration-300',
-        collapsed ? 'w-[72px]' : 'w-[260px]'
+        collapsed 
+          ? '-translate-x-full md:translate-x-0 w-[260px] md:w-[72px]' 
+          : 'translate-x-0 w-[260px]'
       )}
       style={{
         background: 'linear-gradient(180deg, #0f1629 0%, #090e1a 100%)',
@@ -128,10 +130,10 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </div>
       )}
 
-      {/* Collapse toggle */}
+      {/* Collapse toggle (Desktop only) */}
       <button
         onClick={onToggle}
-        className="absolute -right-3 top-20 w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110 z-50"
+        className="hidden md:flex absolute -right-3 top-20 w-6 h-6 rounded-full items-center justify-center transition-all hover:scale-110 z-50"
         style={{
           background: '#1e40af',
           border: '1px solid rgba(59,130,246,0.4)',

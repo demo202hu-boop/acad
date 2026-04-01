@@ -177,8 +177,8 @@ export default function UsersPage() {
       </div>
 
       {/* Filters */}
-      <div className="glass-card p-4 flex flex-wrap gap-3 items-center">
-        <div className="relative flex-1 min-w-[200px]">
+      <div className="glass-card p-3 md:p-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+        <div className="relative flex-1 w-full md:min-w-[200px]">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400" />
           <input
             type="text"
@@ -188,12 +188,12 @@ export default function UsersPage() {
             className="input-field pl-9"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Filter size={14} className="text-dark-400" />
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <Filter size={14} className="text-dark-400 hidden md:block" />
           <select
             value={roleFilter}
             onChange={e => { setRoleFilter(e.target.value as UserRole); setPage(1) }}
-            className="input-field w-36"
+            className="input-field w-full md:w-36"
           >
             {ROLE_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
           </select>

@@ -63,44 +63,14 @@ export default function SettingsPage() {
         <p className="text-sm text-dark-400 mt-0.5">Manage admin configuration</p>
       </div>
 
-      {/* Connection Status */}
-      <div className="glass-card p-6">
-        <div className="flex items-center gap-2 mb-5">
-          <Database size={18} className="text-blue-400" />
-          <h2 className="text-base font-semibold text-white">Database Connection</h2>
+      {/* Secret Snarky Message */}
+      <div className="glass-card p-8 flex flex-col items-center justify-center text-center animate-pulse-slow">
+        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+          style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+          <AlertCircle size={32} className="text-red-400" />
         </div>
-
-        <div className="space-y-3">
-          {[
-            { label: 'Supabase URL', value: supabaseUrl, mono: true },
-            { label: 'Service Role', value: 'Active (bypasses RLS)', mono: false },
-            { label: 'Auth Mode', value: 'Admin panel Password', mono: false },
-            { label: 'Session TTL', value: '8 hours', mono: false },
-          ].map(item => (
-            <div key={item.label} className="flex items-center justify-between py-2.5"
-              style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              <span className="text-sm text-dark-400">{item.label}</span>
-              <div className="flex items-center gap-2">
-                <span className={`text-sm ${item.mono ? 'font-mono text-blue-300' : 'text-dark-200'}`}>
-                  {item.value}
-                </span>
-                {item.mono && (
-                  <button
-                    onClick={() => copyToClipboard(item.value)}
-                    className="p-1 rounded hover:bg-white/10 text-dark-400 hover:text-white transition-colors"
-                  >
-                    <Copy size={12} />
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-
-          <div className="flex items-center gap-2 pt-2">
-            <CheckCircle size={14} className="text-green-400" />
-            <span className="text-xs text-green-300">Connected to Supabase</span>
-          </div>
-        </div>
+        <h2 className="text-xl font-bold text-white mb-2 tracking-wide">Kya Dekh Raha hai BKL !!!!</h2>
+        <p className="text-sm text-dark-400">Yaha kuch nahi milega tere kaam ka.</p>
       </div>
 
       {/* Security */}
@@ -159,47 +129,7 @@ export default function SettingsPage() {
         </form>
       </div>
 
-      {/* Deployment Info */}
-      <div className="glass-card p-6">
-        <div className="flex items-center gap-2 mb-5">
-          <Server size={18} className="text-green-400" />
-          <h2 className="text-base font-semibold text-white">Deployment</h2>
-        </div>
 
-        <div className="space-y-3 mb-5">
-          {[
-            { label: 'Platform', value: 'Vercel (Next.js 14)' },
-            { label: 'Runtime', value: 'Edge / Node.js 18' },
-            { label: 'Deploy Command', value: 'npx vercel --prod', mono: true },
-          ].map(item => (
-            <div key={item.label} className="flex items-center justify-between py-2"
-              style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              <span className="text-sm text-dark-400">{item.label}</span>
-              <div className="flex items-center gap-2">
-                <span className={`text-sm ${(item as any).mono ? 'font-mono text-green-300' : 'text-dark-200'}`}>
-                  {item.value}
-                </span>
-                {(item as any).mono && (
-                  <button onClick={() => copyToClipboard(item.value)}
-                    className="p-1 rounded hover:bg-white/10 text-dark-400 hover:text-white transition-colors">
-                    <Copy size={12} />
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <a
-          href="https://vercel.com/dashboard"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-secondary text-xs"
-        >
-          <ExternalLink size={13} />
-          Open Vercel Dashboard
-        </a>
-      </div>
 
       {/* Danger zone */}
       <div className="glass-card p-6"

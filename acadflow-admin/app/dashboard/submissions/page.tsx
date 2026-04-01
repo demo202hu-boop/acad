@@ -362,7 +362,7 @@ export default function SubmissionsPage() {
       </div>
 
       {/* Filter bar */}
-      <div className="glass-card p-4 flex flex-wrap gap-3 items-center relative z-10">
+      <div className="glass-card p-3 md:p-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center relative z-10">
         <StudentSearch
           selected={selectedStudent}
           onSelect={handleSelectStudent}
@@ -370,15 +370,15 @@ export default function SubmissionsPage() {
         />
 
         {/* Batch filter — shows named batches from batches table */}
-        <div className="flex items-center gap-2">
-          <Filter size={14} className="text-dark-400 flex-shrink-0" />
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <Filter size={14} className="text-dark-400 flex-shrink-0 hidden md:block" />
           <select
             value={batchId}
             onChange={e => {
               setBatchId(e.target.value)
               setPage(1)
             }}
-            className="input-field w-52"
+            className="input-field w-full md:w-52"
           >
             <option value="">All Batches</option>
             {Object.entries(
@@ -401,11 +401,11 @@ export default function SubmissionsPage() {
         </div>
 
         {/* Status filter */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full md:w-auto">
           <select
             value={statusFilter}
             onChange={e => { setStatusFilter(e.target.value as SubmissionStatus | 'all'); setPage(1) }}
-            className="input-field w-40"
+            className="input-field w-full md:w-40"
           >
             {STATUS_OPTIONS.map(opt => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>

@@ -44,7 +44,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
 
   return (
     <header
-      className="fixed top-0 right-0 left-0 z-30 h-16 flex items-center px-6 gap-4"
+      className="sticky top-0 z-30 h-16 flex items-center px-4 md:px-6 gap-3 md:gap-4"
       style={{
         background: 'rgba(9, 14, 26, 0.85)',
         backdropFilter: 'blur(12px)',
@@ -99,7 +99,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
             style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}>
             A
           </div>
-          <span className="text-sm font-medium text-dark-200">Super Admin</span>
+          <span className="text-sm font-medium text-dark-200">ADMIN BAAP</span>
         </div>
 
         {/* Logout */}

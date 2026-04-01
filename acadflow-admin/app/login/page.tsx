@@ -56,9 +56,9 @@ export default function LoginPage() {
         />
       </div>
 
-      <div className="relative w-full max-w-md animate-slide-up">
+      <div className="relative w-full max-w-md animate-slide-up px-2 md:px-0">
         {/* Logo card */}
-        <div className="glass-card p-8 mb-0">
+        <div className="glass-card p-6 md:p-8 mb-0">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 glow-blue"

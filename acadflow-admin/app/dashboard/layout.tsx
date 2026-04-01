@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { clsx } from 'clsx'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import { Toaster } from 'react-hot-toast'
@@ -12,24 +13,43 @@ export default function DashboardLayout({
 }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
+  // Auto-collapse sidebar on mobile screens
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setSidebarCollapsed(true)
+      }
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   return (
-    <div className="min-h-screen bg-dark-950">
+    <div className="min-h-screen bg-dark-950 relative">
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
 
+      {/* Mobile Backdrop overlay */}
+      {!sidebarCollapsed && (
+        <div 
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm md:hidden animate-fade-in"
+          onClick={() => setSidebarCollapsed(true)}
+        />
+      )}
+
       <div
-        className="transition-all duration-300"
-        style={{
-          marginLeft: sidebarCollapsed ? '72px' : '260px',
-          minHeight: '100vh',
-        }}
+        className={clsx(
+          "transition-all duration-300 min-h-screen flex flex-col",
+          sidebarCollapsed ? "md:ml-[72px]" : "md:ml-[260px]"
+        )}
       >
         <Header onMenuToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
 
-        <main className="pt-16">
-          <div className="p-6">
+        <main className="flex-1">
+          <div className="p-4 md:p-6 overflow-x-hidden">
             {children}
           </div>
         </main>

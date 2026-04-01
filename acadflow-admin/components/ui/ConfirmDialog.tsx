@@ -37,17 +37,17 @@ export default function ConfirmDialog({
           <button
             onClick={onClose}
             disabled={loading}
-            className="btn btn-secondary"
+            className="btn btn-secondary justify-center w-full sm:w-auto order-last sm:order-first"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className={`btn ${isDanger ? 'btn-danger' : 'btn-warning'}`}
+            className={`btn ${isDanger ? 'btn-danger' : 'btn-warning'} justify-center w-full sm:w-auto`}
           >
             {loading ? (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center justify-center gap-2 w-full">
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 Processing...
               </span>
