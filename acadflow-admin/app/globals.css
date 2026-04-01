@@ -1,0 +1,342 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   CSS CUSTOM PROPERTIES
+   ============================================ */
+:root {
+  --sidebar-width: 260px;
+  --header-height: 64px;
+  --primary: #3B82F6;
+  --primary-dark: #2563eb;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-dark-950 text-dark-100 antialiased;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ============================================
+   SCROLLBAR STYLES
+   ============================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-dark-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-dark-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-dark-500;
+}
+
+/* ============================================
+   SIDEBAR LAYOUT
+   ============================================ */
+.sidebar {
+  width: var(--sidebar-width);
+  background: linear-gradient(180deg, #0f1629 0%, #0a0f1e 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 72px;
+}
+
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+.main-content.sidebar-collapsed {
+  margin-left: 72px;
+}
+
+/* ============================================
+   GLASSMORPHISM CARD
+   ============================================ */
+.glass-card {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+}
+
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+
+/* ============================================
+   STAT CARDS GRADIENT ACCENTS
+   ============================================ */
+.stat-card-blue::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.stat-card-green::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.stat-card-yellow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.stat-card-red::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* ============================================
+   TABLE STYLES
+   ============================================ */
+.data-table {
+  @apply w-full text-sm;
+}
+
+.data-table thead tr {
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.data-table thead th {
+  @apply px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s ease;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.data-table tbody td {
+  @apply px-4 py-3;
+}
+
+/* ============================================
+   INPUT STYLES
+   ============================================ */
+.input-field {
+  @apply w-full py-2.5 rounded-xl text-sm transition-all duration-200;
+  padding-left: 0.875rem;   /* 14px — enough room without icons */
+  padding-right: 0.875rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: rgba(59, 130, 246, 0.6);
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.input-field::placeholder {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+/* Inputs that have a left-side icon — override padding */
+.input-field.pl-8  { padding-left: 2rem; }
+.input-field.pl-9  { padding-left: 2.5rem; }
+.input-field.pl-10 { padding-left: 2.75rem; }
+
+/* Inputs that have a right-side icon — override padding */
+.input-field.pr-9  { padding-right: 2.5rem; }
+.input-field.pr-10 { padding-right: 2.75rem; }
+
+/* ============================================
+   BUTTON STYLES
+   ============================================ */
+.btn {
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2), 0 0 0 1px rgba(59,130,246,0.3);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.btn-danger {
+  @apply bg-danger-600 text-white hover:bg-danger-700;
+}
+
+.btn-success {
+  @apply bg-success-600 text-white hover:bg-success-700;
+}
+
+.btn-warning {
+  @apply bg-warning-500 text-white hover:bg-warning-600;
+}
+
+/* ============================================
+   SIDEBAR NAV ITEMS
+   ============================================ */
+.nav-item {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.08) 100%);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.nav-item.active .nav-icon {
+  color: #3B82F6;
+}
+
+/* ============================================
+   MODAL OVERLAY
+   ============================================ */
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+/* ============================================
+   STATUS BADGES
+   ============================================ */
+.badge {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-blue   { @apply bg-primary-500/15 text-primary-300; }
+.badge-green  { @apply bg-success-500/15 text-green-300; }
+.badge-yellow { @apply bg-warning-500/15 text-yellow-300; }
+.badge-red    { @apply bg-danger-500/15 text-red-300; }
+.badge-gray   { @apply bg-dark-700 text-dark-300; }
+.badge-purple { background: rgba(168,85,247,0.15); color: #c4b5fd; }
+
+/* ============================================
+   SKELETON LOADER
+   ============================================ */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============================================
+   CUSTOM SELECT
+   ============================================ */
+select.input-field option {
+  background: #1e293b;
+  color: white;
+}
+
+/* ============================================
+   RECHARTS DARK THEME OVERRIDE
+   ============================================ */
+.recharts-cartesian-axis-tick-value {
+  fill: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+}
+
+.recharts-cartesian-grid line {
+  stroke: rgba(255, 255, 255, 0.06);
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: #1e293b !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 8px !important;
+  color: white !important;
+}
+
+/* ============================================
+   LOGIN PAGE GRADIENT BG
+   ============================================ */
+.login-bg {
+  background: radial-gradient(ellipse at top left, rgba(59,130,246,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at bottom right, rgba(16,185,129,0.08) 0%, transparent 60%),
+              #030712;
+}
+
+/* ============================================
+   GLOW EFFECTS
+   ============================================ */
+.glow-blue {
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.2), 0 0 60px rgba(59, 130, 246, 0.08);
+}
+
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
