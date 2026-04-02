@@ -103,11 +103,11 @@ export default function RedoEmailPage() {
 
   const handleQuickFill = () => {
     setForm({
-      enrollment_number: 'VU1F2223083',
-      studentName: 'Harshit Ajay Upadhyay',
-      taskTitle: 'Assignment 2 on Unit 4,5,6',
+      enrollment_number: 'VU1F2223999',
+      studentName: 'John Doe',
+      taskTitle: 'Assignment 1 on Unit 1,2,3',
       feedback: 'You have not submitted this task yet. Please submit it as soon as possible to avoid losing marks.',
-      teacherName: 'Prof. Sneha Tapre',
+      teacherName: 'Prof. Jane Smith',
       emailType: 'missing',
     })
   }
