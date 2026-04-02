@@ -13,6 +13,7 @@ import {
   ChevronRight,
   GraduationCap,
   MessageSquare,
+  MessageCircle,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 
@@ -27,6 +28,7 @@ const navItems = [
   { href: '/dashboard/submissions', icon: FileText, label: 'Submissions' },
   { href: '/dashboard/practicals', icon: FlaskConical, label: 'Practicals' },
   { href: '/dashboard/support', icon: MessageSquare, label: 'Support Desk' },
+  { href: '/dashboard/hod-messages', icon: MessageCircle, label: 'HOD Messages' },
   { href: '/dashboard/redo-email', icon: Zap, label: 'Redo Email ⚡' },
   { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
 ]
