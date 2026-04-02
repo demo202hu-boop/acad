@@ -2,9 +2,12 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'AcadFlow Admin Panel | PVPPCOE',
-  description: 'Administrative dashboard for AcadFlow educational management platform at PVPPCOE.',
-  robots: 'noindex, nofollow', // Keep admin panel off search engines
+  title: 'Admin Panel',
+  description: 'Secure Management Interface.',
+  robots: 'noindex, nofollow, noarchive, nosnippet', // Absolute privacy from all bots
+  creator: 'Admin',
+  publisher: 'Admin',
+  generator: 'SecureSystem v1.0',
 }
 
 export default function RootLayout({

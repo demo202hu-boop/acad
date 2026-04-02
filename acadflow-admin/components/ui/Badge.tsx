@@ -49,3 +49,13 @@ export function PracticalStatusBadge({ status }: { status: string }) {
   const { label, variant } = config[status] || { label: status, variant: 'gray' }
   return <Badge variant={variant} dot>{label}</Badge>
 }
+
+// Ticket status badge
+export function TicketStatusBadge({ status }: { status: string }) {
+  const config: Record<string, { label: string; variant: BadgeProps['variant'] }> = {
+    resolved: { label: 'Resolved', variant: 'green' },
+    open:     { label: 'Open',     variant: 'yellow' },
+  }
+  const { label, variant } = config[status] || { label: status, variant: 'gray' }
+  return <Badge variant={variant} dot>{label}</Badge>
+}
