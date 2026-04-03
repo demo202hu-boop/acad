@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
       .select(
         `*,
         student:profiles!submissions_student_id_fkey(id, name, email, enrollment_number, department, year, division, batch),
-        assignment:assignments(id, title, total_points),
-        practical:batch_practicals(id, title, experiment_number, total_points)`,
+        assignment:assignments(id, title, total_points, rubrics),
+        practical:batch_practicals(id, title, experiment_number, total_points, rubrics)`,
         { count: 'exact' }
       )
 
@@ -101,12 +101,27 @@ export async function PATCH(request: NextRequest) {
     const { id, ...updates } = body
     if (!id) return NextResponse.json({ error: 'Submission ID required' }, { status: 400 })
 
+    // Fetch existing submission to check current evaluation status
+    const { data: existing } = await supabaseAdmin
+      .from('submissions')
+      .select('evaluated_at, status')
+      .eq('id', id)
+      .single()
+
+    const newStatus = updates.marks != null ? 'evaluated' : (updates.status as string || existing?.status)
+    
+    // Only set evaluated_at if it's currently null and we're moving to 'evaluated' status
+    let evaluated_at = existing?.evaluated_at
+    if (!evaluated_at && newStatus === 'evaluated') {
+      evaluated_at = new Date().toISOString()
+    }
+
     const { data, error } = await supabaseAdmin
       .from('submissions')
       .update({
         ...updates,
-        evaluated_at: new Date().toISOString(),
-        status: updates.marks != null ? 'evaluated' : updates.status,
+        evaluated_at,
+        status: newStatus,
       })
       .eq('id', id)
       .select()

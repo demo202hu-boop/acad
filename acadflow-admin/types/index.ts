@@ -38,8 +38,8 @@ export interface Submission {
   rubric_scores?: Record<string, number | null>
   // Joined relations
   student?: Pick<UserProfile, 'id' | 'name' | 'email' | 'enrollment_number' | 'department' | 'year' | 'division' | 'batch'> | null
-  assignment?: { id: string; title: string; subject_id?: string; total_points?: number } | null
-  practical?: { id: string; title: string; experiment_number?: string; total_points?: number } | null
+  assignment?: { id: string; title: string; subject_id?: string; total_points?: number; rubrics?: RubricItem[] } | null
+  practical?: { id: string; title: string; experiment_number?: string; total_points?: number; rubrics?: RubricItem[] } | null
 }
 
 export interface BatchPractical {

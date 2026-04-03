@@ -203,6 +203,7 @@ export default function SubmissionsPage() {
   // Edit modal
   const [editSub, setEditSub] = useState<Submission | null>(null)
   const [editForm, setEditForm] = useState({ marks: '', feedback: '', viva_score: '0', status: '' })
+  const [rubricScores, setRubricScores] = useState<Record<string, string>>({})
   const [editLoading, setEditLoading] = useState(false)
 
   // Delete confirm
@@ -277,21 +278,54 @@ export default function SubmissionsPage() {
       viva_score: String(sub.viva_score || 0),
       status: sub.status,
     })
+    // Pre-fill rubric scores from saved rubric_scores map
+    const rubrics = sub.practical?.rubrics || sub.assignment?.rubrics || []
+    if (rubrics.length > 0) {
+      const initial: Record<string, string> = {}
+      rubrics.forEach((r, idx) => {
+        const ra = r as unknown as Record<string, unknown>
+        const key = String(ra.id || ra.title || ra.name || idx)
+        initial[key] = sub.rubric_scores?.[key] != null ? String(sub.rubric_scores[key]) : ''
+      })
+      setRubricScores(initial)
+    } else {
+      setRubricScores({})
+    }
   }
 
   const handleSaveEdit = async () => {
     if (!editSub) return
     setEditLoading(true)
     try {
+      const rubrics = editSub.practical?.rubrics || editSub.assignment?.rubrics || []
+      // Compute total marks from rubric scores if rubrics exist
+      let computedMarks: number | null = null
+      let rubricScoresPayload: Record<string, number | null> | undefined
+      if (rubrics.length > 0) {
+        rubricScoresPayload = {}
+        let sum = 0
+        rubrics.forEach((r, idx) => {
+          const ra = r as unknown as Record<string, unknown>
+          const key = String(ra.id || ra.title || ra.name || idx)
+          const val = rubricScores[key] !== '' ? parseInt(rubricScores[key] || '0') || 0 : 0
+          rubricScoresPayload![key] = val
+          sum += val
+        })
+        computedMarks = sum
+      } else {
+        computedMarks = editForm.marks !== '' ? parseInt(editForm.marks) : null
+      }
+
       const res = await fetch('/api/admin/submissions', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: editSub.id,
-          marks: editForm.marks !== '' ? parseInt(editForm.marks) : null,
+          marks: computedMarks,
           feedback: editForm.feedback || null,
           viva_score: parseInt(editForm.viva_score) || 0,
           status: editForm.status,
+          ...(rubricScoresPayload ? { rubric_scores: rubricScoresPayload } : {}),
         }),
       })
       const json = await res.json()
@@ -461,6 +495,7 @@ export default function SubmissionsPage() {
                       <th className="text-center">Viva</th>
                       <th>Feedback</th>
                       <th>Submitted</th>
+                      <th>Evaluated</th>
                       <th className="text-right">Actions</th>
                     </tr>
                   </thead>
@@ -578,6 +613,13 @@ export default function SubmissionsPage() {
                             : '—'}
                         </td>
 
+                        {/* Evaluated at */}
+                        <td className="text-xs text-dark-400 whitespace-nowrap">
+                          {sub.evaluated_at
+                            ? format(new Date(sub.evaluated_at), 'dd MMM yy HH:mm')
+                            : <span className="text-dark-600 italic">Pending</span>}
+                        </td>
+
                         {/* Actions */}
                         <td>
                           <div className="flex items-center gap-1 justify-end">
@@ -648,36 +690,115 @@ export default function SubmissionsPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-dark-300 mb-1.5">
-                  Marks
-                  {editSub.practical?.total_points && (
-                    <span className="text-dark-500 ml-1">/ {editSub.practical.total_points}</span>
-                  )}
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max={editSub.practical?.total_points || 100}
-                  value={editForm.marks}
-                  onChange={e => setEditForm(f => ({ ...f, marks: e.target.value }))}
-                  className="input-field text-lg font-semibold"
-                  placeholder="0"
-                />
+            {/* Rubric-based marks OR plain marks input */}
+            {((editSub.practical?.rubrics?.length ?? 0) > 0 || (editSub.assignment?.rubrics?.length ?? 0) > 0) ? (() => {
+              const activeRubrics = editSub.practical?.rubrics || editSub.assignment?.rubrics || [];
+              const totalPoints = editSub.practical?.total_points || editSub.assignment?.total_points;
+              
+              return (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-medium text-dark-300">Marks Breakdown</label>
+                  <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                    style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399' }}>
+                    Total: {activeRubrics.reduce((sum, r, idx) => {
+                      const ra = r as unknown as Record<string, unknown>
+                      const key = String(ra.id || ra.title || ra.name || idx)
+                      return sum + (parseInt(rubricScores[key] || '0') || 0)
+                    }, 0)} / {totalPoints ?? activeRubrics.reduce((s, r) => {
+                      const ra = r as unknown as Record<string, unknown>
+                      return s + Number(ra.max_marks ?? ra.maxMarks ?? ra.marks ?? 0)
+                    }, 0)}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {activeRubrics.map((rubric, idx) => {
+                    // Handle various possible field names from Supabase JSONB
+                    const rubricAny = rubric as unknown as Record<string, unknown>
+                    const label = String(
+                      rubricAny.title || rubricAny.name || rubricAny.criteria ||
+                      rubricAny.label || rubricAny.criterion || `Criterion ${idx + 1}`
+                    )
+                    const desc = String(rubricAny.description || rubricAny.desc || '')
+                    const maxMarks = Number(rubricAny.max_marks ?? rubricAny.maxMarks ?? rubricAny.marks ?? 0)
+                    const key = String(rubricAny.id || rubricAny.title || rubricAny.name || idx)
+                    return (
+                      <div key={key}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg"
+                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)' }}
+                      >
+                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                          style={{ background: 'rgba(99,102,241,0.25)', color: '#a5b4fc' }}>
+                          {idx + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-white">{label}</p>
+                          {desc && (
+                            <p className="text-xs text-dark-400 mt-0.5">{desc}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <input
+                            type="number"
+                            min="0"
+                            max={maxMarks}
+                            value={rubricScores[key] ?? ''}
+                            onChange={e => setRubricScores(prev => ({ ...prev, [key]: e.target.value }))}
+                            className="input-field text-center font-semibold"
+                            style={{ width: '72px' }}
+                            placeholder="0"
+                          />
+                          <span className="text-xs text-dark-400 whitespace-nowrap">/ {maxMarks}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+                {/* Viva below rubrics */}
+                <div>
+                  <label className="block text-xs font-medium text-dark-300 mb-1.5">Viva Score (0–10)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={editForm.viva_score}
+                    onChange={e => setEditForm(f => ({ ...f, viva_score: e.target.value }))}
+                    className="input-field"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-xs font-medium text-dark-300 mb-1.5">Viva Score (0–10)</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="10"
-                  value={editForm.viva_score}
-                  onChange={e => setEditForm(f => ({ ...f, viva_score: e.target.value }))}
-                  className="input-field"
-                />
+            )})() : (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-dark-300 mb-1.5">
+                    Marks
+                    {(editSub.practical?.total_points || editSub.assignment?.total_points) && (
+                      <span className="text-dark-500 ml-1">/ {editSub.practical?.total_points || editSub.assignment?.total_points}</span>
+                    )}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max={editSub.practical?.total_points || editSub.assignment?.total_points || 100}
+                    value={editForm.marks}
+                    onChange={e => setEditForm(f => ({ ...f, marks: e.target.value }))}
+                    className="input-field text-lg font-semibold"
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-dark-300 mb-1.5">Viva Score (0–10)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={editForm.viva_score}
+                    onChange={e => setEditForm(f => ({ ...f, viva_score: e.target.value }))}
+                    className="input-field"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <div>
               <label className="block text-xs font-medium text-dark-300 mb-1.5">Status</label>
