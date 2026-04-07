@@ -55,12 +55,23 @@ function maintenancePage() {
     body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
       background:linear-gradient(135deg,#0a0a0f 0%,#0d0f1e 40%,#0a0a0f 100%);
       font-family:system-ui,sans-serif;color:#fff;text-align:center;padding:24px;position:relative;overflow:hidden}
-    .grid{position:fixed;inset:0;background-image:linear-gradient(rgba(99,102,241,.05) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(99,102,241,.05) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
-    .blob{position:fixed;width:600px;height:600px;border-radius:50%;
-      background:radial-gradient(circle,#7c3aed,#dc2626);filter:blur(130px);opacity:.18;
-      top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 3s ease-in-out infinite}
-    @keyframes pulse{0%,100%{opacity:.13;transform:translate(-50%,-50%) scale(1)}50%{opacity:.25;transform:translate(-50%,-50%) scale(1.08)}}
+    .grid{position:fixed;inset:0;background-image:linear-gradient(rgba(99,102,241,.15) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(99,102,241,.15) 1px,transparent 1px);background-size:40px 40px;
+      pointer-events:none;animation:panGrid 15s linear infinite}
+    @keyframes panGrid{from{transform:translateY(0) translateX(0)}to{transform:translateY(40px) translateX(40px)}}
+    
+    /* Colorful orbital blobs */
+    .blob-wrapper{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+    .blob1{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,#ec4899,#db2777);
+      filter:blur(100px);opacity:.3;top:10%;left:20%;animation:orbit1 12s infinite alternate ease-in-out;}
+    .blob2{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,#3b82f6,#2563eb);
+      filter:blur(120px);opacity:.3;bottom:10%;right:10%;animation:orbit2 15s infinite alternate ease-in-out;}
+    .blob3{position:absolute;width:450px;height:450px;border-radius:50%;background:radial-gradient(circle,#8b5cf6,#7c3aed);
+      filter:blur(110px);opacity:.25;top:40%;left:50%;transform:translate(-50%,-50%);animation:pulse 4s infinite alternate ease-in-out;}
+      
+    @keyframes orbit1{0%{transform:translate(0,0) scale(1)}100%{transform:translate(200px,100px) scale(1.2)}}
+    @keyframes orbit2{0%{transform:translate(0,0) scale(1)}100%{transform:translate(-150px,-150px) scale(1.1)}}
+    @keyframes pulse{0%{opacity:.15;transform:translate(-50%,-50%) scale(.9)}100%{opacity:.3;transform:translate(-50%,-50%) scale(1.1)}}
     .card{position:relative;z-index:1;background:rgba(255,255,255,.04);
       border:1px solid rgba(255,255,255,.09);backdrop-filter:blur(28px);
       border-radius:28px;padding:44px 36px;max-width:440px;width:100%;
@@ -76,7 +87,10 @@ function maintenancePage() {
     .dot{width:7px;height:7px;border-radius:50%;background:#f87171;animation:ping 1s infinite}
     @keyframes ping{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
     .msg{font-size:15px;color:rgba(255,255,255,.75);line-height:1.65;margin-bottom:22px;
-      min-height:52px;font-weight:500;transition:opacity .3s}
+      min-height:80px;display:flex;align-items:center;justify-content:center;font-weight:500;transition:opacity .3s}
+    .progress-bar-container{width:100%;height:3px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden;margin-bottom:24px;}
+    .progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#ff4b2b,#ff416c,#8b5cf6,#3b82f6);
+      transition:width .1s linear;border-radius:10px;}
     .foot{font-size:11px;color:rgba(255,255,255,.18);line-height:1.6}
     .counter{font-size:12px;color:rgba(255,255,255,.25);margin-top:6px;font-mono}
     .mkc{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);
@@ -85,13 +99,20 @@ function maintenancePage() {
 </head>
 <body>
   <div class="grid"></div>
-  <div class="blob"></div>
+  <div class="blob-wrapper">
+    <div class="blob1"></div>
+    <div class="blob2"></div>
+    <div class="blob3"></div>
+  </div>
   <div class="card">
     <span class="emoji" id="emoji">🛠️</span>
     <h1>Maintenance Chal Raha Hai</h1>
     <p class="sub" id="sub">System ki gaasi fat chuki hai</p>
     <div class="badge"><span class="dot"></span>SAALA BAND HAI — RUK BSDK</div>
-    <p class="msg" id="msg">Thoda wait kar chutiye, theek kar rahe hain.</p>
+    <div class="msg" id="msg">Thoda wait kar chutiye, theek kar rahe hain.</div>
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
     <p class="foot">Kab aayega? Behenchod humein bhi nahi pata. 🙃<br><span class="counter" id="cnt"></span></p>
   </div>
   <span class="mkc" id="mkc">mkc</span>
@@ -99,39 +120,43 @@ function maintenancePage() {
     const emojis=['🛠️','💀','🤡','💩','😵‍💫','🥲','😤','🙃','🫠','💔','🤬','😈','🫡','🤦','🤷'];
     const subs=[
       'System ki gaand fat chuki hai',
-      'Intern ne phir se lund ka kaam kiya hai',
-      'Server bhosadiwala ro raha hai kone mein',
+      'Kaam bilkul lund barabar ho raha hai',
+      'Bhosdiwale chup chap wait kar le thoda',
       'Neeche se leke upar tak sab chud gaya hai',
       'Sab theek ho jaayega... maa chudaye',
-      'Hamara dil aur server — dono ki aisi tesi ho gayi',
-      'Koi bkl nahi fixed kar pa raha',
+      'Dimag ki dahi aur gaand ka dhaga dono khul gaya',
+      'Kise ne bhi theek kiya toh swarg milega mc ko',
       'Jugaad bhi lund barabar kaam nahi kar raha',
     ];
     const msgs=[
-      'Hamara server maa chuda raha hai, time lagega muh mein lele. ☕',
-      'Abe lode ruk ja yaar, gaand mat mara apni idhar! 🤙',
-      'BKL intern ne seedha production mein tatti kar di. BC kya karu iska. 😤',
-      'Server ki behen chud gayi. HR se nayi randi lene ki baat chal rahi hai. 💼',
-      'Bhai saab, system gaya apni maa chudane. Thoda wait kar gaandu. 🛢️',
-      'Error 404: Developer k gaand k parche udd gaye. 💀',
+      'Maa chudi padi hai yahan, time lagega thoda muh mein lele. ☕',
+      'Abe lode ruk ja yaar, gaand mat mara apni aake idhar! 🤙',
+      'BKL kisi ne lund jaisa kaam kiya hai yahan. BC kya karu iska. 😤',
+      'Har jagah maa behen chud chuki hai. Jaa abhi apni gaand mara jaa ke. 💼',
+      'Bhai saab, sab kuch gaya apni maa chudane. Thoda wait kar gaandu. 🛢️',
+      'Error 404: Dimag ki maa chud gayi poori tarah. 💀',
       'Yeh sab teri wajah se hua hai madarchod. Haan, behenchod tujhe bol raha hoon. 😡',
-      'Hum code fix kar rahe hain. Gandu shaant reh thoda warn gand mein danda de duga. 🔢',
-      'Chal hat bkl, server ki gaand phati hai, aur mat maar uski. 😴',
-      'Database ne bhi lund pakda diya yaar. Sabse bade chutiye aur mc nikle. 💔',
+      'Kaam chal raha hai. Gandu shaant reh warna teri gaand mein danda de duga. 🔢',
+      'Chal hat bkl, meri apni phati padi hai idhar, aur mat maar pakad ke. 😴',
+      'Kismat ne aur in mc logo ne ek dum lund pakda diya yaar bhenchod. 💔',
       'Bhai ek kaam kar — chai bana aur aa. Tab tak hum ye lund chudap theek karte hain. 🍵',
       'Tere baap ka lund hai jo 24/7 khada rahega chut ke patthe? Ruk ja thoda. 😂',
-      'System ne gaand mar li hmari. Teri randi ex ki tarah. 🫠',
-      'Production pe code push karte waqt tatte kaanp rahe the. Pata tha lawde lagenge. 🤡',
-      'Saale chutiye maa k lode intern ko bataya tha test kar. BC seedha prod pe maa chod di. 🤦',
-      'Server bolta hai: Gaand mara lo bhai, aaram chahiye aur nahi chudna mujhe. 🥲',
-      'Maa chudi padi hai bc. Hum raat ke andhere mein lund dhoondh rahe hain. 🕯️',
-      'Ek chut jaisa bug fix karo toh gaand se teen aur randwe nikal aate hain. 🐍',
-      'Na lund khada hua na chudai mili... na idhar ka code chal raha na server chalu hai. 🎭',
-      'Main seedha bata raha hu, mujhe lund kuch samjh nahi aa raha kya hua hai, bas button daba rha hoo. 😵',
+      'Kismat ne gaand mar li hmari. Teri randi ex ki tarah. 🫠',
+      'Pehle hi gaand se aawaz aa rahi thi lafde lagenge, phir nahaq akele ungli kardi humne. 🤡',
+      'Saale chutiye ko bola tha dhyan rakhne ko, par mc ne naye tareeke se maa chod di dobara. 🤦',
+      'Maa kasam ab lag raha hai sub chor ke, aaram se gaand mara lo bhai. 🥲',
+      'Maa chudi padi hai bc. Hum raat ke andhere mein lund aur rasta dhoondh rahe hain. 🕯️',
+      'Ek kalesh theek karne jao toh gaand se teen aur randwe bkl lund nikal aate hain. 🐍',
+      'Na lund khada hua na chudai mili... lode alag ghisne pad rahe hain khali. 🎭',
+      'Main seedha bata raha hu, mujhe lund kuch samjh nahi aa raha ab, kya maa chud rahi hai yahan. 😵',
     ];
     let i=0;
-    setInterval(()=>{
+    let pbStartTime = Date.now();
+    const cycleDur = 6000;
+    
+    const updateText = () => {
       i=(i+1)%emojis.length;
+      pbStartTime = Date.now();
       const el=document.getElementById('emoji');
       const ms=document.getElementById('msg');
       const sb=document.getElementById('sub');
@@ -142,7 +167,20 @@ function maintenancePage() {
         if(sb)sb.textContent=subs[i%subs.length];
         el.style.opacity='1';ms.style.opacity='1';
       },300);
-    },3500);
+    };
+    
+    let autoTimer = setInterval(updateText, cycleDur);
+    
+    // Progress bar animation loop
+    const pb = document.getElementById('progress-bar');
+    const animatePb = () => {
+      const elapsed = Date.now() - pbStartTime;
+      const pct = Math.min((elapsed / cycleDur) * 100, 100);
+      pb.style.width = pct + '%';
+      requestAnimationFrame(animatePb);
+    };
+    requestAnimationFrame(animatePb);
+    
     // Live 'time wasted' counter
     let secs=0;
     setInterval(()=>{

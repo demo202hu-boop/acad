@@ -11,33 +11,36 @@ interface Props {
 
 const EMOJIS = ['🛠️', '💀', '🤡', '💩', '😵‍💫', '🥲', '😤', '🙃', '🫠', '💔', '🤬', '😈', '🫡', '🤦', '🤷']
 const FUNNY_LINES = [
-  'Hamara server maa chuda raha hai, time lagega muh mein lele. ☕',
-  'Abe lode ruk ja yaar, gaand mat mara apni idhar! 🤙',
-  'BKL intern ne seedha production mein tatti kar di. BC kya karu iska. 😤',
-  'Server ki behen chud gayi. HR se nayi randi lene ki baat chal rahi hai. 💼',
-  'Bhai saab, system gaya apni maa chudane. Thoda wait kar gaandu. 🛢️',
-  'Error 404: Developer k gaand k parche udd gaye. 💀',
+  'Maa chudi padi hai yahan, time lagega thoda muh mein lele. ☕',
+  'Abe lode ruk ja yaar, gaand mat mara apni aake idhar! 🤙',
+  'BKL kisi ne lund jaisa kaam kiya hai yahan. BC kya karu iska. 😤',
+  'Har jagah maa behen chud chuki hai. Jaa abhi apni gaand mara jaa ke. 💼',
+  'Bhai saab, sab kuch gaya apni maa chudane. Thoda wait kar gaandu. 🛢️',
+  'Error 404: Dimag ki maa chud gayi poori tarah. 💀',
   'Yeh sab teri wajah se hua hai madarchod. Haan, behenchod tujhe bol raha hoon. 😡',
-  'Hum code fix kar rahe hain. Gandu shaant reh thoda warn gand mein danda de duga. 🔢',
-  'Chal hat bkl, server ki gaand phati hai, aur mat maar uski. 😴',
-  'Database ne bhi lund pakda diya yaar. Sabse bade chutiye aur mc nikle. 💔',
+  'Kaam chal raha hai. Gandu shaant reh warna teri gaand mein danda de duga. 🔢',
+  'Chal hat bkl, meri apni phati padi hai idhar, aur mat maar pakad ke. 😴',
+  'Kismat ne aur in mc logo ne ek dum lund pakda diya yaar bhenchod. 💔',
   'Bhai ek kaam kar — chai bana aur aa. Tab tak hum ye lund chudap theek karte hain. 🍵',
   'Tere baap ka lund hai jo 24/7 khada rahega chut ke patthe? Ruk ja thoda. 😂',
-  'System ne gaand mar li hmari. Teri randi ex ki tarah. 🫠',
-  'Production pe code push karte waqt tatte kaanp rahe the. Pata tha lawde lagenge. 🤡',
-  'Saale chutiye maa k lode intern ko bataya tha test kar. BC seedha prod pe maa chod di. 🤦',
-  'Server bolta hai: Gaand mara lo bhai, aaram chahiye aur nahi chudna mujhe. 🥲',
-  'Maa chudi padi hai bc. Hum raat ke andhere mein lund dhoondh rahe hain. 🕯️',
-  'Ek chut jaisa bug fix karo toh gaand se teen aur randwe nikal aate hain. 🐍',
-  'Na lund khada hua na chudai mili... na idhar ka code chal raha na server chalu hai. 🎭',
-  'Main seedha bata raha hu, mujhe lund kuch samjh nahi aa raha kya hua hai, bas button daba rha hoo. 😵',
+  'Kismat ne gaand mar li hmari. Teri randi ex ki tarah. 🫠',
+  'Pehle hi gaand se aawaz aa rahi thi lafde lagenge, phir nahaq akele ungli kardi humne. 🤡',
+  'Saale chutiye ko bola tha dhyan rakhne ko, par mc ne naye tareeke se maa chod di dobara. 🤦',
+  'Maa kasam ab lag raha hai sub chor ke, aaram se gaand mara lo bhai. 🥲',
+  'Maa chudi padi hai bc. Hum raat ke andhere mein lund aur rasta dhoondh rahe hain. 🕯️',
+  'Ek kalesh theek karne jao toh gaand se teen aur randwe bkl lund nikal aate hain. 🐍',
+  'Na lund khada hua na chudai mili... lode alag ghisne pad rahe hain khali. 🎭',
+  'Main seedha bata raha hu, mujhe lund kuch samjh nahi aa raha ab, kya maa chud rahi hai yahan. 😵',
 ]
 
 export default function MaintenanceOverlay({ onDisable }: Props) {
+  const CYCLE_DUR = 6000
+  const [idx, setIdx]               = useState(0)
   const [emoji, setEmoji]           = useState(EMOJIS[0])
   const [line, setLine]             = useState(FUNNY_LINES[0])
   const [dots, setDots]             = useState('.')
   const [shake, setShake]           = useState(false)
+  const [progress, setProgress]     = useState(0)
 
   // Secret "mkc" double-tap logic
   const [codeInput, setCodeInput]   = useState('')
@@ -45,16 +48,32 @@ export default function MaintenanceOverlay({ onDisable }: Props) {
   const [wrongCode, setWrongCode]   = useState(false)
   const tapCountRef                 = useRef(0)
   const tapTimerRef                 = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const startTimeRef                = useRef<number>(Date.now())
 
-  // Cycle emoji + line every 3s
+  // Cycle emoji + line
   useEffect(() => {
-    let i = 0
-    const id = setInterval(() => {
-      i = (i + 1) % EMOJIS.length
-      setEmoji(EMOJIS[i])
-      setLine(FUNNY_LINES[i % FUNNY_LINES.length])
-    }, 3000)
-    return () => clearInterval(id)
+    setEmoji(EMOJIS[idx % EMOJIS.length])
+    setLine(FUNNY_LINES[idx % FUNNY_LINES.length])
+  }, [idx])
+
+  // Progress Bar Animation
+  useEffect(() => {
+    let animationFrameId: number
+
+    const tick = () => {
+      const elapsed = Date.now() - startTimeRef.current
+      if (elapsed >= CYCLE_DUR) {
+        startTimeRef.current = Date.now()
+        setIdx(prev => prev + 1)
+        setProgress(0)
+      } else {
+        setProgress((elapsed / CYCLE_DUR) * 100)
+      }
+      animationFrameId = requestAnimationFrame(tick)
+    }
+    
+    animationFrameId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(animationFrameId)
   }, [])
 
   // Animate dots
@@ -106,28 +125,69 @@ export default function MaintenanceOverlay({ onDisable }: Props) {
         fontFamily: 'system-ui, sans-serif',
       }}
     >
+      <style>{`
+        @keyframes panGrid {
+          from { transform: translateY(0) translateX(0); }
+          to { transform: translateY(40px) translateX(40px); }
+        }
+        @keyframes orbit1 {
+          0% { transform: translate(0,0) scale(1); }
+          100% { transform: translate(200px,100px) scale(1.2); }
+        }
+        @keyframes orbit2 {
+          0% { transform: translate(0,0) scale(1); }
+          100% { transform: translate(-150px,-150px) scale(1.1); }
+        }
+        @keyframes rainbowBg {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
       {/* Animated grid bg */}
       <div
-        className="absolute inset-0 opacity-[0.04]"
+        className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(99,102,241,0.5) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(99,102,241,0.5) 1px, transparent 1px)
+            linear-gradient(rgba(99,102,241,0.15) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99,102,241,0.15) 1px, transparent 1px)
           `,
           backgroundSize: '40px 40px',
+          animation: 'panGrid 15s linear infinite'
         }}
       />
 
-      {/* Glowing blob */}
-      <div
-        className="absolute rounded-full blur-3xl opacity-20 animate-pulse"
-        style={{
-          width: 500, height: 500,
-          background: 'radial-gradient(circle, #6366f1, #8b5cf6)',
-          top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-      />
+      {/* Glowing Orbital Blobs */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div
+          className="absolute rounded-full opacity-30 mix-blend-screen"
+          style={{
+            width: 400, height: 400, top: '10%', left: '20%',
+            background: 'radial-gradient(circle, #ec4899, #db2777)',
+            filter: 'blur(100px)',
+            animation: 'orbit1 12s infinite alternate ease-in-out'
+          }}
+        />
+        <div
+          className="absolute rounded-full opacity-30 mix-blend-screen"
+          style={{
+            width: 500, height: 500, bottom: '10%', right: '10%',
+            background: 'radial-gradient(circle, #3b82f6, #2563eb)',
+            filter: 'blur(120px)',
+            animation: 'orbit2 15s infinite alternate ease-in-out'
+          }}
+        />
+        <div
+          className="absolute rounded-full max-w-full opacity-25 mix-blend-screen animate-pulse"
+          style={{
+            width: 450, height: 450, top: '40%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'radial-gradient(circle, #8b5cf6, #7c3aed)',
+            filter: 'blur(110px)',
+            animationDuration: '4s'
+          }}
+        />
+      </div>
 
       {/* Content card */}
       <div
@@ -158,9 +218,22 @@ export default function MaintenanceOverlay({ onDisable }: Props) {
         </div>
 
         {/* Funny rotating line */}
-        <p className="text-sm text-slate-200 leading-relaxed mb-1 min-h-[52px] transition-all duration-500 font-medium">
-          {line}
-        </p>
+        <div className="flex items-center justify-center min-h-[80px] w-full mb-3">
+          <p className="text-[15px] font-medium text-slate-200 leading-relaxed transition-all duration-300">
+            {line}
+          </p>
+        </div>
+
+        {/* 6-second progress bar */}
+        <div className="w-full h-[3px] bg-white/10 rounded-full overflow-hidden mb-6">
+          <div 
+            className="h-full rounded-full transition-all duration-75 ease-linear"
+            style={{ 
+              width: `${progress}%`,
+              background: 'linear-gradient(90deg, #ff4b2b, #ff416c, #8b5cf6, #3b82f6)'
+            }}
+          />
+        </div>
 
         {/* Loading dots */}
         <p className="text-indigo-400 text-sm font-mono mt-2 mb-8 tracking-widest">
