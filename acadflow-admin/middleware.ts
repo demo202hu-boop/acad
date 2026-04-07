@@ -193,10 +193,16 @@ function maintenancePage() {
           if(!code) return;
           fetch('/api/admin/maintenance-unlock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})})
           .then(r=>r.json()).then(d=>{
-            if(d.success){alert('✅ Le khul gaya!');location.reload();}
+            const err = document.getElementById('modal-error');
+            err.style.display = 'block';
+            if(d.success){
+              err.style.color = '#22c55e';
+              err.textContent = '✅ Theek hai bhai khul gaya! Loading...';
+              input.style.border = '1px solid #22c55e';
+              setTimeout(() => location.reload(), 800);
+            }
             else {
-              const err = document.getElementById('modal-error');
-              err.style.display = 'block';
+              err.style.color = '#ef4444';
               err.textContent = '❌ Galat code bkl! Maa chuda.';
               input.style.border = '1px solid #ef4444';
               input.style.background = 'rgba(239,68,68,0.1)';
@@ -234,9 +240,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── Check maintenance mode (server-side, works for ALL browsers) ──
-  const underMaintenance = await isMaintenanceActive()
-  if (underMaintenance) {
-    return maintenancePage()
+  // If user *just* unlocked it via UI, they get a 45s bypass cookie to skip the 30s DB cache.
+  if (request.cookies.get('acadflow_maintenance_bypass')?.value === 'true') {
+    // Cache bypassed
+  } else {
+    const underMaintenance = await isMaintenanceActive()
+    if (underMaintenance) {
+      return maintenancePage()
+    }
   }
 
   // ── Normal auth guards ───────────────────────────────────────────────────
