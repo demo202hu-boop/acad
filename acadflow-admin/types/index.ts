@@ -5,7 +5,7 @@ export interface UserProfile {
   name: string
   email: string
   role: 'student' | 'teacher' | 'admin'
-  enrollment_number?: string   // e.g. VU1F2223092
+  enrollment_number?: string   // student enrollment ID
   department?: string          // e.g. Computer Engineering
   year?: number                // Current year: 1–4
   division?: string            // e.g. B

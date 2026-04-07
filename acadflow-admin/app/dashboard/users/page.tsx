@@ -408,12 +408,11 @@ export default function UsersPage() {
           <div>
             <label className="block text-xs font-medium text-dark-300 mb-1.5">
               Enrollment ID
-              <span className="text-dark-600 font-normal ml-1">e.g. VU1F2223092</span>
             </label>
             <input type="text" value={editForm.enrollment_number || ''}
               onChange={e => setEditForm(f => ({ ...f, enrollment_number: e.target.value }))}
               className="input-field font-mono"
-              placeholder="VU1F2223092" />
+              placeholder="Enter enrollment ID" />
           </div>
 
           {/* Department */}

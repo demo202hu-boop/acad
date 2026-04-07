@@ -38,8 +38,11 @@ export default function DashboardPage() {
   const [showWelcome, setShowWelcome] = useState(false)
 
   useEffect(() => {
-    // Show welcome popup every time dashboard loads
-    setTimeout(() => setShowWelcome(true), 600)
+    // Only show welcome popup when maintenance mode is OFF
+    const isMaintenance = localStorage.getItem('acadflow_maintenance_on') === 'true'
+    if (!isMaintenance) {
+      setTimeout(() => setShowWelcome(true), 600)
+    }
   }, [])
 
   useEffect(() => {

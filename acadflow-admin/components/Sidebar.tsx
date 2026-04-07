@@ -6,14 +6,14 @@ import {
   LayoutDashboard,
   Users,
   FileText,
-  FlaskConical,
+  Layers,
   Settings,
   Zap,
   ChevronLeft,
   ChevronRight,
   GraduationCap,
   MessageSquare,
-  MessageCircle,
+  Bell,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 
@@ -26,9 +26,9 @@ const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', exact: true },
   { href: '/dashboard/users', icon: Users, label: 'Users' },
   { href: '/dashboard/submissions', icon: FileText, label: 'Submissions' },
-  { href: '/dashboard/practicals', icon: FlaskConical, label: 'Practicals' },
+  { href: '/dashboard/practicals', icon: Layers, label: 'Batch' },
   { href: '/dashboard/support', icon: MessageSquare, label: 'Support Desk' },
-  { href: '/dashboard/hod-messages', icon: MessageCircle, label: 'HOD Messages' },
+  { href: '/dashboard/hod-messages', icon: Bell, label: 'Notifications' },
   { href: '/dashboard/redo-email', icon: Zap, label: 'Redo Email ⚡' },
   { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
 ]

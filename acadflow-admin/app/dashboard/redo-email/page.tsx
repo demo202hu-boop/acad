@@ -103,7 +103,7 @@ export default function RedoEmailPage() {
 
   const handleQuickFill = () => {
     setForm({
-      enrollment_number: 'VU1F2223999',
+      enrollment_number: 'STU-DEMO-001',
       studentName: 'John Doe',
       taskTitle: 'Assignment 1 on Unit 1,2,3',
       feedback: 'You have not submitted this task yet. Please submit it as soon as possible to avoid losing marks.',
@@ -151,7 +151,7 @@ export default function RedoEmailPage() {
                   value={form.enrollment_number}
                   onChange={handleChange}
                   required
-                  placeholder="e.g. VU1F2223083"
+                  placeholder="Enter enrollment number"
                   className="w-full px-4 py-2.5 rounded-xl bg-dark-900/80 border border-dark-600 text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500/50 transition-all"
                 />
               </div>

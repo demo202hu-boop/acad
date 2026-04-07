@@ -13,12 +13,10 @@ export default function DashboardLayout({
 }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
-  // Auto-collapse sidebar on mobile screens
+  // Auto-collapse sidebar on mobile
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setSidebarCollapsed(true)
-      }
+      if (window.innerWidth < 768) setSidebarCollapsed(true)
     }
     handleResize()
     window.addEventListener('resize', handleResize)
@@ -32,9 +30,9 @@ export default function DashboardLayout({
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
 
-      {/* Mobile Backdrop overlay */}
+      {/* Mobile backdrop */}
       {!sidebarCollapsed && (
-        <div 
+        <div
           className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm md:hidden animate-fade-in"
           onClick={() => setSidebarCollapsed(true)}
         />
@@ -42,16 +40,13 @@ export default function DashboardLayout({
 
       <div
         className={clsx(
-          "transition-all duration-300 min-h-screen flex flex-col",
-          sidebarCollapsed ? "md:ml-[72px]" : "md:ml-[260px]"
+          'transition-all duration-300 min-h-screen flex flex-col',
+          sidebarCollapsed ? 'md:ml-[72px]' : 'md:ml-[260px]'
         )}
       >
         <Header onMenuToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
-
         <main className="flex-1">
-          <div className="p-4 md:p-6 overflow-x-hidden">
-            {children}
-          </div>
+          <div className="p-4 md:p-6 overflow-x-hidden">{children}</div>
         </main>
       </div>
 
@@ -65,12 +60,8 @@ export default function DashboardLayout({
             borderRadius: '12px',
             fontSize: '14px',
           },
-          success: {
-            iconTheme: { primary: '#10B981', secondary: '#fff' },
-          },
-          error: {
-            iconTheme: { primary: '#EF4444', secondary: '#fff' },
-          },
+          success: { iconTheme: { primary: '#10B981', secondary: '#fff' } },
+          error:   { iconTheme: { primary: '#EF4444', secondary: '#fff' } },
         }}
       />
     </div>

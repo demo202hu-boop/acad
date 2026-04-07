@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       // Fetch those specific batches
       const { data: batches, error: batchErr } = await supabaseAdmin
         .from('batches')
-        .select('id, name, code, year, division, batch, academic_year')
+        .select('id, name, code, year, division, batch, academic_year, created_by')
         .in('id', batchIds)
         .order('year',     { ascending: true })
         .order('division', { ascending: true })
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     // No student_id — return all batches
     const { data, error } = await supabaseAdmin
       .from('batches')
-      .select('id, name, code, year, division, batch, academic_year')
+      .select('id, name, code, year, division, batch, academic_year, created_by')
       .order('year',     { ascending: true })
       .order('division', { ascending: true })
       .order('batch',    { ascending: true })
@@ -75,3 +75,87 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: msg }, { status: 500 })
   }
 }
+
+export async function POST(request: NextRequest) {
+  if (!await isAuthenticatedServer()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await request.json() as Record<string, unknown>
+
+    // Validate required fields
+    if (!body.name || !body.division || !body.batch) {
+      return NextResponse.json(
+        { error: 'name, division, and batch are required' },
+        { status: 400 }
+      )
+    }
+
+    // Auto-generate a code if not provided
+    if (!body.code) {
+      body.code = `${String(body.division).toUpperCase()}${String(body.batch).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('batches')
+      .insert(body)
+      .select('id, name, code, year, division, batch, academic_year, created_by')
+      .single()
+
+    if (error) throw error
+    return NextResponse.json({ success: true, data })
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Unknown error'
+    return NextResponse.json({ error: msg }, { status: 500 })
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  if (!await isAuthenticatedServer()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await request.json() as Record<string, unknown>
+    const { id, ...updates } = body
+
+    if (!id) return NextResponse.json({ error: 'Batch ID required' }, { status: 400 })
+
+    const { data, error } = await supabaseAdmin
+      .from('batches')
+      .update(updates)
+      .eq('id', id)
+      .select('id, name, code, year, division, batch, academic_year, created_by')
+      .single()
+
+    if (error) throw error
+    return NextResponse.json({ success: true, data })
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Unknown error'
+    return NextResponse.json({ error: msg }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  if (!await isAuthenticatedServer()) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await request.json() as { id?: string }
+    if (!body.id) return NextResponse.json({ error: 'Batch ID required' }, { status: 400 })
+
+    const { error } = await supabaseAdmin
+      .from('batches')
+      .delete()
+      .eq('id', body.id)
+
+    if (error) throw error
+    return NextResponse.json({ success: true })
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Unknown error'
+    return NextResponse.json({ error: msg }, { status: 500 })
+  }
+}
+
