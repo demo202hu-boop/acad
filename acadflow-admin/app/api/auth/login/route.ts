@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { validateAdminPassword, getSessionCookieOptions } from '@/lib/auth'
+import { validateAdminPassword, getSessionCookieOptions, createSessionToken } from '@/lib/auth'
 
 export async function POST(request: Request) {
   try {
@@ -23,8 +23,9 @@ export async function POST(request: Request) {
     }
 
     const cookieOptions = getSessionCookieOptions()
+    const token = await createSessionToken()
     const response = NextResponse.json({ success: true })
-    response.cookies.set(cookieOptions)
+    response.cookies.set({ ...cookieOptions, value: token })
     return response
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Internal server error'

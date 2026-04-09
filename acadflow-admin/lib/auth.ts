@@ -1,34 +1,77 @@
 import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
+import { SignJWT, jwtVerify } from 'jose'
 
 const SESSION_COOKIE = 'af_admin_session'
-const SESSION_VALUE = 'authenticated'
+export const MAINTENANCE_COOKIE = 'acadflow_maintenance_bypass'
+
+const getSecretKey = () => {
+  const secret = process.env.ADMIN_SESSION_SECRET || 'fallback-secret-for-acadflow-admin-change-in-prod'
+  return new TextEncoder().encode(secret)
+}
+
+/**
+ * Creates a signed JWT token for admin session.
+ */
+export async function createSessionToken(payload: any = { role: 'admin' }) {
+  return await new SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('8h')
+    .sign(getSecretKey())
+}
+
+/**
+ * Creates a signed JWT specifically for maintenance bypass.
+ */
+export async function createMaintenanceBypassToken() {
+  return await new SignJWT({ maintenance_bypass: true })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('45s') // Short-lived bypass
+    .sign(getSecretKey())
+}
+
+/**
+ * Verifies a JWT token. Returns the payload if valid, null otherwise.
+ */
+export async function verifyToken(token: string | undefined | null) {
+  if (!token) return null
+  try {
+    const { payload } = await jwtVerify(token, getSecretKey())
+    return payload
+  } catch (err) {
+    return null
+  }
+}
 
 // ============================================
 // Server-side auth helpers (API routes / Server Components)
 // ============================================
 
 /**
- * Check if admin session cookie is set (server-side).
+ * Check if admin session cookie is set and valid (server-side).
  * Next.js 15: cookies() is now async.
  */
 export async function isAuthenticatedServer(): Promise<boolean> {
   try {
     const cookieStore = await cookies()
-    const session = cookieStore.get(SESSION_COOKIE)
-    return session?.value === SESSION_VALUE
+    const sessionToken = cookieStore.get(SESSION_COOKIE)?.value
+    const payload = await verifyToken(sessionToken)
+    return !!payload
   } catch {
     return false
   }
 }
 
 /**
- * Check if admin session cookie is set from a request (middleware).
+ * Check if admin session is set and valid from a request (middleware).
  * Middleware still uses synchronous request.cookies.
  */
-export function isAuthenticatedFromRequest(request: NextRequest): boolean {
-  const session = request.cookies.get(SESSION_COOKIE)
-  return session?.value === SESSION_VALUE
+export async function isAuthenticatedFromRequest(request: NextRequest): Promise<boolean> {
+  const sessionToken = request.cookies.get(SESSION_COOKIE)?.value
+  const payload = await verifyToken(sessionToken)
+  return !!payload
 }
 
 /**
@@ -50,7 +93,6 @@ export function validateAdminPassword(password: string): boolean {
 export function getSessionCookieOptions() {
   return {
     name: SESSION_COOKIE,
-    value: SESSION_VALUE,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax' as const,

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { maintenanceDb } from '@/lib/supabase-maintenance'
+import { createMaintenanceBypassToken, MAINTENANCE_COOKIE } from '@/lib/auth'
 
 /**
  * Called by the maintenance HTML page's hidden "mkc" double-tap unlock.
@@ -21,8 +22,9 @@ export async function POST(req: Request) {
 
     if (error) throw error
     
+    const token = await createMaintenanceBypassToken()
     const res = NextResponse.json({ success: true })
-    res.cookies.set('acadflow_maintenance_bypass', 'true', { maxAge: 45, path: '/' })
+    res.cookies.set(MAINTENANCE_COOKIE, token, { maxAge: 45, path: '/' })
     return res
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 })

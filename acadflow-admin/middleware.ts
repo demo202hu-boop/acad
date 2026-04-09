@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { isAuthenticatedFromRequest } from '@/lib/auth'
+import { isAuthenticatedFromRequest, verifyToken, MAINTENANCE_COOKIE } from '@/lib/auth'
 
 // ── Maintenance cache (module-level, resets per cold-start — fine for this) ──
 let maintenanceCache: { active: boolean; fetchedAt: number } = {
@@ -279,7 +279,16 @@ export async function middleware(request: NextRequest) {
 
   // ── Check maintenance mode (server-side, works for ALL browsers) ──
   // If user *just* unlocked it via UI, they get a 45s bypass cookie to skip the 30s DB cache.
-  if (request.cookies.get('acadflow_maintenance_bypass')?.value === 'true') {
+  let isMaintenanceBypassed = false;
+  const bypassToken = request.cookies.get(MAINTENANCE_COOKIE)?.value
+  if (bypassToken) {
+    const payload = await verifyToken(bypassToken)
+    if (payload?.maintenance_bypass) {
+      isMaintenanceBypassed = true
+    }
+  }
+
+  if (isMaintenanceBypassed) {
     // Cache bypassed
   } else {
     const underMaintenance = await isMaintenanceActive()
@@ -290,13 +299,15 @@ export async function middleware(request: NextRequest) {
 
   // ── Normal auth guards ───────────────────────────────────────────────────
   if (pathname.startsWith('/dashboard')) {
-    if (!isAuthenticatedFromRequest(request)) {
+    const isAuth = await isAuthenticatedFromRequest(request)
+    if (!isAuth) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
   }
 
   if (pathname === '/login' || pathname === '/') {
-    if (isAuthenticatedFromRequest(request)) {
+    const isAuth = await isAuthenticatedFromRequest(request)
+    if (isAuth) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }
