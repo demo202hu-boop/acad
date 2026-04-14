@@ -26,6 +26,7 @@ const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', exact: true },
   { href: '/dashboard/users', icon: Users, label: 'Users' },
   { href: '/dashboard/submissions', icon: FileText, label: 'Submissions' },
+  { href: '/dashboard/verifications', icon: GraduationCap, label: 'Verifications' },
   { href: '/dashboard/practicals', icon: Layers, label: 'Batch' },
   { href: '/dashboard/support', icon: MessageSquare, label: 'Support Desk' },
   { href: '/dashboard/hod-messages', icon: Bell, label: 'Notifications' },

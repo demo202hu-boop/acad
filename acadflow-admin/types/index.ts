@@ -115,6 +115,8 @@ export interface Participation {
   created_at: string
   event_date?: string
   event_end_date?: string
+  rejection_reason?: string | null
+  other_status_text?: string | null
   student?: Pick<UserProfile, 'id' | 'name' | 'email' | 'enrollment_number'>
 }
 
