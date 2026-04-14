@@ -239,6 +239,7 @@ export default function VerificationsPage() {
           event_type: 'inside',
           event_details: '',
           participation_status: 'participant',
+          status: 'pending',
           points_awarded: 0,
           event_date: '',
           event_end_date: '',
